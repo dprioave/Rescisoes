@@ -180,8 +180,25 @@ function razao(r){return RAZAO[r.empresa]||r.empresa||""}
 function iso(d){var m=d.getMonth()+1,x=d.getDate();return d.getFullYear()+"-"+(m<10?"0":"")+m+"-"+(x<10?"0":"")+x}
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
 function fd(s){if(!s)return "—";var p=s.split("-");return p[2]+"/"+p[1]+"/"+p[0]}
-function mat(m){var s=String(m==null?"":m).trim();return /^\d+$/.test(s)&&s.length<6?("000000"+s).slice(-6):s}
 function norm(s){return String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase()}
+var FUNCOES=["Almoxarife", "Analista Administrativo", "Analista Comercial", "Analista Contabil", "Analista de Compras", "Analista de Controladoria", "Analista de DP", "Analista de Execucao", "Analista de Gente e Cultura", "Analista de Incorporacao", "Analista de Infraestrutura de TI", "Analista de Legalização", "Analista de Marketing", "Analista de Mercado", "Analista de Orçamento", "Analista de Patrimonio", "Analista de Projetos", "Analista de Qualidade", "Analista de Remuneração", "Analista de TI", "Analista Financeiro", "Analista Fiscal", "Analista Juridico", "Analista Tecnico", "Aprendiz Administrativo", "Aprendiz Recepcao", "Armador de Estrutura de Concreto", "Arquiteto", "Assessoria Admnistrativa", "Assistente Administrativo", "Assistente Comercial", "Assistente Contabil", "Assistente de Compras", "Assistente de Contratos", "Assistente de Custos e Planejamentos", "Assistente de Desenvolvimento", "Assistente de DP", "Assistente de Engenharia a Montante", "Assistente de ESG e Meio Ambiente", "Assistente de Gente e Cultura", "Assistente de Gestão de Terceiros", "Assistente de Marketing", "Assistente de Orcamento", "Assistente de Patrimonio", "Assistente de Personalizacao", "Assistente de Produtos", "Assistente de Projetos", "Assistente de Relacionamento com Cliente", "Assistente de SDR", "Assistente de Tecnologia da Informacao", "Assistente Fiscal", "Assistente Gestao", "Auxiliar Administrativo", "Auxiliar de Almoxarifado", "Auxiliar de Arquitetura", "Auxiliar de Contabilidade", "Auxiliar de Eletricista", "Auxiliar de Encanador", "Auxiliar de Engenharia Civil", "Auxiliar de Manutenção", "Auxiliar de Servicos Gerais", "Auxiliar de Topografia", "Auxiliar Servicos Gerais", "Carpinteiro de Obras", "Caseiro", "Comprador", "Consultora de Legalizacao e Patrimonio", "Coordenador (a) de Assistencia Tecnica", "Coordenador (a) de PDV", "Coordenador (a) Jurdico", "Coordenador Contabil", "Coordenador de Engenharia", "Coordenador de Incorporacao", "Coordenador de Obras", "Coordenador de Orçamento", "Coordenador de Produto", "Coordenador de Projetos", "Coordenador de Qualidade e Meio Ambiente", "Coordenador de Seguranca do Trabalho", "Coordenador Financeiro", "Coordenador(a) de Legalizacao", "Coordenadora de Gente e Cultura", "Eletricista", "Encanador", "Encarregado de Armacao", "Encarregado de Carpintaria", "Encarregado de Encanador", "Encarregado de Hidraulica", "Encarregado de Obra", "Encarregado de Obras", "Encarregado de Topografia", "Encarregado Eletricista", "Encarregado Eletricista de Instalacoes", "Engenheiro Trainee", "Especialista de Processos", "Estagiario de Arquitetura", "Estagiario de Gente e Cultura", "Estagiário de Instalacoes Eletricas", "Estagiario de Marketing", "Estagiario de Meio Ambiente", "Estagiario de Projetos", "Estagiario de Relacionamento", "Estagiario de Suprimentos", "Estagiario de TI", "Estagiario Engenharia Civil", "Estagiario Juridico", "Estagiario QSMS", "Estagiario Tec Seg Trabalho", "Executiva (o) de Vendas", "Garçom", "Gerente Comercial", "Gerente de Engenharia", "Gerente de Engenharia a Montante", "Gerente de Instalacoes", "Gerente de Manutençao", "Gerente de Marketing", "Gerente de Obras", "Gerente de Patrimonio", "Gerente de QSMS e Garantia", "Gerente de Relacionamento com o Cliente", "Gerente de Tecnologia da Informação", "Gerente Executiva de Gente e Gestao", "Gerente Executiva de Incorporacao", "Gerente Executivo de Controladoria e Processos", "Gerente Executivo de Projetos", "Gerente Financeiro", "Gerente House", "Gerente Jurdico", "Gerente Tecnico", "Gesseiro", "Graniteiro", "Jovem Aprendiz", "Lider de Manutenção", "Marceneiro", "Mestre de Obras", "Montador de Andaimes", "Motociclista no Transp Documentos", "Motorista de Caminhao", "Operador de Betoneira", "Operador de Elevador Cremalheira", "Operador de Grua", "Operador de Guincho", "Pedreiro", "Pintor", "Porteiro", "Recepcionista", "Secretaria(o) Executiva(o)", "Serralheiro", "Servente de Obras", "Servicos Gerais", "Sinaleiro", "Superintendente de Engenharia", "Superintendente de Novos Negocios", "Supervisor de Custos e Planejamento", "Supervisor de Equipamentos", "Supervisor de Interiores", "Supervisor de Marketing", "Supervisor de Personalizacao", "Supervisor de Projetos", "Supervisor de SDR", "Supervisor Financeiro", "Tecnico (a) de Edificacoes", "Tecnico em Edificacoes", "Tecnico em Seguranca do Trabalho"];
+var FN_PREP={de:1,da:1,do:1,das:1,dos:1,e:1,em:1,para:1,com:1,a:1,o:1,as:1,os:1,na:1,no:1,nas:1,nos:1,ao:1,aos:1,por:1,ou:1,"à":1};
+var FN_ACR={dp:1,ti:1,sdr:1,esg:1,pdv:1,qsms:1,cipa:1,sst:1,epi:1,rh:1,spe:1,pcp:1};
+var FN_ROMAN={i:1,ii:1,iii:1,iv:1,v:1,vi:1};
+function stdCase(s){
+  var words=String(s==null?"":s).replace(/\s+/g," ").trim().split(" ");
+  return words.map(function(w,i){
+    var low=w.toLowerCase(),core=low.replace(/[^\wà-ÿ]/g,"");
+    if(FN_ACR[core])return low.replace(/[\wà-ÿ]+/,function(m){return m.toUpperCase()});
+    if(FN_ROMAN[core]&&words.length>1&&i>0)return low.toUpperCase();
+    if(FN_PREP[core]&&i>0)return low;
+    var p=low.split("-").map(function(x){return x.charAt(0).toUpperCase()+x.slice(1)}).join("-");
+    return p.replace(/^\((\w)/,function(m,c){return "("+c.toUpperCase()});
+  }).join(" ");
+}
+var FN_MAP={};FUNCOES.forEach(function(f){FN_MAP[norm(f)]=f});
+function canonFuncao(s){var t=stdCase(s);return FN_MAP[norm(t)]||t}
+function mat(m){var s=String(m==null?"":m).trim();return /^\d+$/.test(s)&&s.length<6?("000000"+s).slice(-6):s}
 function mk(r){return (r.dataDeslig||"").slice(0,7)}
 function $(id){return document.getElementById(id)}
 function toast(t){var e=document.createElement("div");e.className="toast";e.textContent=t;document.body.appendChild(e);setTimeout(function(){e.remove()},2600)}
@@ -373,7 +390,7 @@ function openModal(id){
   root.innerHTML='<div class="modal-bg" id="mbg"><div class="modal" role="dialog" aria-modal="true" aria-label="Rescisão"><h3>'+(id?"Rescisão de "+esc((r.nome||"").trim()):"Nova rescisão")+'</h3><div class="form">'+
     selectF("e_empresa","Empresa",EMPRESAS,r.empresa)+selectF("e_tipo","Tipo do aviso",TIPOS,r.tipo)+'<div class="field" id="rowTrab"'+(r.tipo==="PEDIDO DE DEMISSÃO"?"":" hidden")+'><label for="e_trabalhado">Pedido de demissão</label><label class="chk"><input type="checkbox" id="e_trabalhado"'+(trab?" checked":"")+ro+'> Aviso trabalhado (30 dias)</label></div>'+
     field("e_matricula","Matrícula (6 dígitos)",mat(r.matricula),"text",ro)+field("e_nome","Nome",(r.nome||"").trim(),"text",ro)+
-    field("e_funcao","Função",(r.funcao||"").trim(),"text",ro)+
+    '<div class="field"><label for="e_funcao">Função</label><input id="e_funcao" type="text" list="dlFuncoes" autocomplete="off" placeholder="Escolha na lista ou digite" value="'+esc(canonFuncao(r.funcao||""))+'"'+ro+'><datalist id="dlFuncoes">'+FUNCOES.map(function(f){return '<option value="'+esc(f)+'">'}).join("")+'</datalist></div>'+
     field("e_dataAviso","Data do aviso",r.dataAviso,"date",ro)+field("e_dataDeslig","Data do desligamento",r.dataDeslig,"date",ro)+field("e_dataPgto","Data do pagamento",r.dataPgto,"date",ro)+
     '<div class="field full hint">Datas calculadas automaticamente e editáveis. Desligamento: aviso trabalhado = data do aviso + 30 dias; demais = data do aviso. Pagamento: prazo de 10 dias corridos contando o dia do desligamento (desligamento + 9 dias); se o prazo cair em sábado, domingo ou feriado, antecipa para o dia útil anterior. Feriados no meio do prazo não alteram a contagem.</div>'+field("e_tituloResc","Título rescisão",r.tituloResc,"text",ro)+field("e_tituloGfd","Título GFD",r.tituloGfd,"text",ro)+
     '<div class="field"><label for="e_validacao">Validação</label><select id="e_validacao"'+ro+'><option value=""'+(r.validacao==="OK"?"":" selected")+'>Aguardando</option><option value="OK"'+(r.validacao==="OK"?" selected":"")+'>OK</option></select></div>'+
@@ -387,6 +404,7 @@ function openModal(id){
     $("e_dataAviso").onchange=recalcDeslig;
     $("e_dataDeslig").onchange=recalcPgto;
   }
+  if(canWrite&&$("e_funcao"))$("e_funcao").onchange=function(){this.value=canonFuncao(this.value)};
   function close(){root.innerHTML=""}
   $("mCancel").onclick=close;
   $("mbg").onclick=function(e){if(e.target===$("mbg"))close()};
@@ -398,7 +416,7 @@ function openModal(id){
   if($("mSave"))$("mSave").onclick=function(){
     function g(k){return $("e_"+k).value.trim()}
     var m=g("matricula");
-    var d={empresa:g("empresa"),tipo:g("tipo"),matricula:/^\d+$/.test(m)?Number(m):m,nome:g("nome"),funcao:g("funcao"),dataAviso:g("dataAviso"),dataDeslig:g("dataDeslig"),dataPgto:g("dataPgto"),tituloResc:g("tituloResc"),tituloGfd:g("tituloGfd"),validacao:g("validacao"),motivo:g("motivo"),trabalhado:g("tipo")==="PEDIDO DE DEMISSÃO"&&$("e_trabalhado").checked};
+    var d={empresa:g("empresa"),tipo:g("tipo"),matricula:/^\d+$/.test(m)?Number(m):m,nome:g("nome"),funcao:canonFuncao(g("funcao")),dataAviso:g("dataAviso"),dataDeslig:g("dataDeslig"),dataPgto:g("dataPgto"),tituloResc:g("tituloResc"),tituloGfd:g("tituloGfd"),validacao:g("validacao"),motivo:g("motivo"),trabalhado:g("tipo")==="PEDIDO DE DEMISSÃO"&&$("e_trabalhado").checked};
     if(!d.nome||!d.dataDeslig){toast("Informe ao menos nome e data do desligamento.");return}
     var p=id?db.doc("rescisoes/"+id).set(d):db.collection("rescisoes").add(d);
     p.then(function(){close();toast("Rescisão salva")},function(){toast("Não foi possível salvar. Verifique sua permissão de edição.")});
