@@ -90,7 +90,7 @@ td .sub{color:var(--muted);font-size:12px}
 .form{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
 .field{display:flex;flex-direction:column;gap:4px;min-width:0}
 .field label{font-size:12px;color:var(--muted)}
-.field.full{grid-column:1/-1}.hint{font-size:12px;color:var(--muted)}.chk{display:flex;align-items:center;gap:8px;color:var(--fg)!important;font-size:13px!important;padding:7px 0}.chk input{width:auto}
+.field.full{grid-column:1/-1}.hint{font-size:12px;color:var(--muted)}.req{color:var(--bad)}.field textarea.bad{border-color:var(--bad);box-shadow:0 0 0 1px var(--bad)}.chk{display:flex;align-items:center;gap:8px;color:var(--fg)!important;font-size:13px!important;padding:7px 0}.chk input{width:auto}
 .field textarea{min-height:64px;resize:vertical}
 .mfoot{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:#222b38;border:1px solid var(--line);padding:9px 16px;border-radius:8px;z-index:20}
@@ -395,7 +395,7 @@ function openModal(id){
     field("e_dataAviso","Data do aviso",r.dataAviso,"date",ro)+field("e_dataDeslig","Data do desligamento",r.dataDeslig,"date",ro)+field("e_dataPgto","Data do pagamento",r.dataPgto,"date",ro)+
     '<div class="field full hint">Datas calculadas automaticamente e editáveis. Desligamento: aviso trabalhado = data do aviso + 30 dias; demais = data do aviso. Pagamento: prazo de 10 dias corridos contando o dia do desligamento (desligamento + 9 dias); se o prazo cair em sábado, domingo ou feriado, antecipa para o dia útil anterior. Feriados no meio do prazo não alteram a contagem.</div>'+field("e_tituloResc","Título rescisão",r.tituloResc,"text",ro)+field("e_tituloGfd","Título GFD",r.tituloGfd,"text",ro)+
     '<div class="field"><label for="e_validacao">Validação</label><select id="e_validacao"'+ro+'><option value=""'+(r.validacao==="OK"?"":" selected")+'>Aguardando</option><option value="OK"'+(r.validacao==="OK"?" selected":"")+'>OK</option></select></div>'+
-    '<div class="field full"><label for="e_motivo">Motivo da demissão</label><textarea id="e_motivo"'+ro+'>'+esc((r.motivo||"").trim())+'</textarea></div></div>'+
+    '<div class="field full"><label for="e_motivo">Motivo da demissão <span class="req">*</span></label><textarea id="e_motivo" aria-required="true" placeholder="Obrigatório"'+ro+'>'+esc((r.motivo||"").trim())+'</textarea></div></div>'+
     '<div class="mfoot"><div>'+(id&&canWrite?'<button class="btn danger" id="mDel">Excluir</button>':'')+'</div><div class="actions"><button class="btn" id="mCancel">'+(canWrite?"Cancelar":"Fechar")+'</button>'+(canWrite?'<button class="btn primary" id="mSave">Salvar</button>':'')+'</div></div></div></div>';
   function recalcPgto(){var d=$("e_dataDeslig").value;if(d)$("e_dataPgto").value=calcPgto(d)}
   function recalcDeslig(){var a=$("e_dataAviso").value;if(!a)return;$("e_dataDeslig").value=calcDeslig($("e_tipo").value,$("e_trabalhado").checked,a);recalcPgto()}
@@ -406,6 +406,7 @@ function openModal(id){
     $("e_dataDeslig").onchange=recalcPgto;
   }
   if(canWrite&&$("e_funcao"))$("e_funcao").onchange=function(){this.value=canonFuncao(this.value)};
+  if($("e_motivo"))$("e_motivo").oninput=function(){if(this.value.trim())this.classList.remove("bad")};
   function close(){root.innerHTML=""}
   $("mCancel").onclick=close;
   $("mbg").onclick=function(e){if(e.target===$("mbg"))close()};
@@ -419,6 +420,7 @@ function openModal(id){
     var m=g("matricula");
     var d={empresa:g("empresa"),tipo:g("tipo"),matricula:/^\d+$/.test(m)?Number(m):m,nome:g("nome"),funcao:canonFuncao(g("funcao")),dataAviso:g("dataAviso"),dataDeslig:g("dataDeslig"),dataPgto:g("dataPgto"),tituloResc:g("tituloResc"),tituloGfd:g("tituloGfd"),validacao:g("validacao"),motivo:g("motivo"),trabalhado:g("tipo")==="PEDIDO DE DEMISSÃO"&&$("e_trabalhado").checked};
     if(!d.nome||!d.dataDeslig){toast("Informe ao menos nome e data do desligamento.");return}
+    if(!d.motivo){var mo=$("e_motivo");mo.classList.add("bad");mo.focus();toast("Informe o motivo da demissão antes de salvar.");return}
     var p=id?db.doc("rescisoes/"+id).set(d):db.collection("rescisoes").add(d);
     p.then(function(){close();toast("Rescisão salva")},function(){toast("Não foi possível salvar. Verifique sua permissão de edição.")});
   };
