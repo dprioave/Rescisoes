@@ -199,6 +199,7 @@ function stdCase(s){
 var FN_MAP={};FUNCOES.forEach(function(f){FN_MAP[norm(f)]=f});
 var FN_ALIAS={"encarregado de obra":"Encarregado de Obras","encarregado eletricista de instalacoes":"Encarregado Eletricista"};
 function canonFuncao(s){var t=stdCase(s),k=norm(t);return FN_ALIAS[k]||FN_MAP[k]||t}
+function semMotivoAlerta(r){var m=(r.dataDeslig||"").slice(0,7);return (m==="2026-10"||m==="2026-11")&&!String(r.motivo||"").trim()}
 function mat(m){var s=String(m==null?"":m).trim();return /^\d+$/.test(s)&&s.length<6?("000000"+s).slice(-6):s}
 function mk(r){return (r.dataDeslig||"").slice(0,7)}
 function $(id){return document.getElementById(id)}
@@ -248,7 +249,7 @@ function renderLista(list){
   var h='<div class="card"><p class="count">'+list.length+' de '+rows.length+' rescisões · clique numa linha para ver ou editar'+(nCF?' · <button class="btn small" id="clearCF">Limpar filtros das colunas</button>':'')+'</p><div class="tw"><table><thead><tr>'+COLS.map(function(c){var on=S.col===c[0],fa=!!CFV[c[0]];return '<th aria-sort="'+(on?(S.dir>0?"ascending":"descending"):"none")+'"><button class="fb'+(fa?" active":"")+'" data-col="'+c[0]+'" aria-haspopup="true" title="Filtrar e ordenar">'+c[1]+'<span class="ic">'+(on?(S.dir>0?"▲":"▼"):"")+'</span><svg class="fun" viewBox="0 0 12 12" width="11" height="11" aria-hidden="true"><path d="M1 2h10L7 6.5V10L5 11V6.5z" fill="'+(fa?"currentColor":"none")+'" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg></button></th>'}).join("")+'</tr></thead><tbody>';
   list.forEach(function(r){
     var s=status(r);
-    h+='<tr data-id="'+esc(r._id)+'"><td class="emp">'+esc(razao(r))+' <span class="sub">'+esc(r.empresa)+'</span></td><td class="mono">'+esc(mat(r.matricula))+'</td><td class="nm">'+esc((r.nome||"").trim())+' <span class="sub">'+esc((r.funcao||"").trim())+'</span></td><td>'+esc(r.tipo)+'</td><td class="mono">'+fd(r.dataAviso)+'</td><td class="mono">'+fd(r.dataDeslig)+'</td><td class="mono">'+fd(r.dataPgto)+'</td><td class="mono">'+esc(tituloTxt(r.tituloResc))+' / '+esc(tituloTxt(r.tituloGfd))+'</td><td><span class="pill '+s.k+'">'+s.t+'</span></td></tr>';
+    h+='<tr data-id="'+esc(r._id)+'"><td class="emp">'+esc(razao(r))+' <span class="sub">'+esc(r.empresa)+'</span></td><td class="mono">'+esc(mat(r.matricula))+'</td><td class="nm">'+(semMotivoAlerta(r)?'<span class="alerta" title="Motivo da demissão não informado" aria-label="Motivo da demissão não informado">⚠️</span> ':'')+esc((r.nome||"").trim())+' <span class="sub">'+esc((r.funcao||"").trim())+'</span></td><td>'+esc(r.tipo)+'</td><td class="mono">'+fd(r.dataAviso)+'</td><td class="mono">'+fd(r.dataDeslig)+'</td><td class="mono">'+fd(r.dataPgto)+'</td><td class="mono">'+esc(tituloTxt(r.tituloResc))+' / '+esc(tituloTxt(r.tituloGfd))+'</td><td><span class="pill '+s.k+'">'+s.t+'</span></td></tr>';
   });
   if(!list.length)h+='<tr><td colspan="9" class="empty">Nenhuma rescisão com esses filtros.</td></tr>';
   return h+'</tbody></table></div></div>';
