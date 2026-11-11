@@ -132,7 +132,8 @@ td .sub{color:var(--muted);font-size:12px}
 "use strict";
 var MESES=["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
 var MESES_L=["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
-var TIPOS=["AVISO TRABALHADO","AVISO INDENIZADO","PEDIDO DE DEMISSÃO","TÉRMINO EXPERIÊNCIA","TÉRMINO ESTÁGIO","JUSTA CAUSA","RESC. ANTECIPADA","FALECIMENTO"];
+var TIPOS=["AVISO TRABALHADO","AVISO INDENIZADO","PEDIDO DE DEMISSÃO","TÉRMINO EXPERIÊNCIA","TÉRMINO ESTÁGIO","JUSTA CAUSA","RESC. ANTECIPADA","FALECIMENTO","TRANSFERÊNCIA"];
+var MOTIVO_TRANSF="Transferência entre empresas do mesmo grupo.";
 var EMPRESAS=["AUGURI","BOSSA","CIDADE JARDIM","EQUIPAMENTOS","INVESTIMENTOS","JARDINS ANGELA VIEIRA","MARIE CURIE","RAÍZES","SUBHOLDING","UNIQUE","VILA NINITA","VIVANT","ESSENZA"].sort();
 var db=null, canWrite=true, rows=[], loaded=false, docs={};
 var F={emp:"",tipo:"",mes:"",q:""};
@@ -401,7 +402,12 @@ function openModal(id){
   function recalcPgto(){var d=$("e_dataDeslig").value;if(d)$("e_dataPgto").value=calcPgto(d)}
   function recalcDeslig(){var a=$("e_dataAviso").value;if(!a)return;$("e_dataDeslig").value=calcDeslig($("e_tipo").value,$("e_trabalhado").checked,a);recalcPgto()}
   if(canWrite){
-    $("e_tipo").onchange=function(){$("rowTrab").hidden=this.value!=="PEDIDO DE DEMISSÃO";recalcDeslig()};
+    $("e_tipo").onchange=function(){
+      $("rowTrab").hidden=this.value!=="PEDIDO DE DEMISSÃO";
+      var mo=$("e_motivo");
+      if(this.value==="TRANSFERÊNCIA"){mo.value=MOTIVO_TRANSF;mo.classList.remove("bad")}
+      else if(mo.value.trim()===MOTIVO_TRANSF){mo.value=""}
+      recalcDeslig()};
     $("e_trabalhado").onchange=recalcDeslig;
     $("e_dataAviso").onchange=recalcDeslig;
     $("e_dataDeslig").onchange=recalcPgto;
